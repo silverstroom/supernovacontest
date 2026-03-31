@@ -25,6 +25,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<TabKey>("home");
   const [activeEdition, setActiveEdition] = useState(EDITIONS[0]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [ratingFilter, setRatingFilter] = useState<"unrated" | "rated">("unrated");
   const [favorites, setFavorites] = useState<Set<string>>(() => {
     try {
       const stored = localStorage.getItem("supernova_favorites");
@@ -127,54 +128,42 @@ const Index = () => {
     return (
       <AnimatePresence mode="wait">
         <motion.div
-          key={`${activeTab}-${activeCity}-${searchQuery}`}
+          key={`${activeTab}-${activeCity}-${searchQuery}-${ratingFilter}`}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.2 }}
           className="space-y-3"
         >
-          {totalFiltered === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-muted-foreground font-display">
-                {activeTab === "search" ? "Nessun risultato" 
-                  : activeTab === "favorites" ? "Nessun preferito salvato"
-                  : "Nessun artista iscritto"}
-              </p>
-            </div>
-          ) : (
-            <>
-              {unratedArtists.map((artist, i) => (
-                <ArtistCard
-                  key={artist.id}
-                  artist={artist}
-                  onRate={handleRate}
-                  onToggleFavorite={toggleFavorite}
-                  isFavorite={favorites.has(artist.id)}
-                  index={i}
-                />
-              ))}
-              {ratedArtists.length > 0 && (
-                <>
-                  <div className="pt-4 pb-1">
-                    <p className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">
-                      Già votati
-                    </p>
-                  </div>
-                  {ratedArtists.map((artist, i) => (
-                    <ArtistCard
-                      key={artist.id}
-                      artist={artist}
-                      onRate={handleRate}
-                      onToggleFavorite={toggleFavorite}
-                      isFavorite={favorites.has(artist.id)}
-                      index={unratedArtists.length + i}
-                    />
-                  ))}
-                </>
-              )}
-            </>
-          )}
+          {(() => {
+            const displayArtists = activeTab === "home" 
+              ? (ratingFilter === "unrated" ? unratedArtists : ratedArtists)
+              : [...unratedArtists, ...ratedArtists];
+            
+            if (displayArtists.length === 0) {
+              return (
+                <div className="text-center py-16">
+                  <p className="text-muted-foreground font-display">
+                    {activeTab === "search" ? "Nessun risultato" 
+                      : activeTab === "favorites" ? "Nessun preferito salvato"
+                      : ratingFilter === "rated" ? "Nessun artista votato"
+                      : "Tutti gli artisti sono stati votati!"}
+                  </p>
+                </div>
+              );
+            }
+
+            return displayArtists.map((artist, i) => (
+              <ArtistCard
+                key={artist.id}
+                artist={artist}
+                onRate={handleRate}
+                onToggleFavorite={toggleFavorite}
+                isFavorite={favorites.has(artist.id)}
+                index={i}
+              />
+            ));
+          })()}
         </motion.div>
       </AnimatePresence>
     );
@@ -268,6 +257,28 @@ const Index = () => {
               >
                 <MapPin size={14} />
                 {city.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Rating filter toggle (on home tab) */}
+        {activeTab === "home" && (
+          <div className="flex gap-2">
+            {([
+              { key: "unrated" as const, label: "Da votare", count: unratedArtists.length },
+              { key: "rated" as const, label: "Già votati", count: ratedArtists.length },
+            ]).map((filter) => (
+              <button
+                key={filter.key}
+                onClick={() => setRatingFilter(filter.key)}
+                className={`flex-1 px-3 py-2 rounded-xl font-display text-xs font-medium transition-all text-center ${
+                  ratingFilter === filter.key
+                    ? "bg-foreground text-background shadow-sm"
+                    : "glass text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {filter.label} ({filter.count})
               </button>
             ))}
           </div>
