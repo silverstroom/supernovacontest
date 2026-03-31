@@ -34,7 +34,7 @@ const Index = () => {
 
   const queryClient = useQueryClient();
   const { data: artistsData, isLoading, error, refetch } = useArtists();
-  const { data: ratingsData } = useRatings(EDITION);
+  const { data: ratingsData } = useRatings(activeEdition.edition);
 
   const ratingsMap: Record<string, number> = useMemo(() => {
     const map: Record<string, number> = {};
