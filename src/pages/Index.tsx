@@ -1,49 +1,17 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin } from "lucide-react";
+import { MapPin, Loader2, RefreshCw, Calendar } from "lucide-react";
+import { useArtists, useRatings } from "@/hooks/useArtists";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 import type { Artist } from "@/types/artist";
 import ArtistCard from "@/components/ArtistCard";
 import PasswordGate from "@/components/PasswordGate";
 import logoSupernova from "@/assets/logo-supernova.png";
 
-// Mock data - will be replaced with Gravity Forms API data
-const MOCK_ARTISTS: Artist[] = [
-  {
-    id: "1",
-    name: "Luna Nova",
-    instagram: "lunanova_music",
-    song1_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    song1_title: "Stelle Cadenti",
-    song2_url: "https://soundcloud.com/example/track",
-    song2_title: "Notte Infinita",
-    song3_url: "https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT",
-    song3_title: "Aurora Boreale",
-    city: "bologna",
-  },
-  {
-    id: "2",
-    name: "Eclissi",
-    instagram: "eclissi_band",
-    song1_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    song1_title: "Ombre di Luce",
-    song2_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    song2_title: "Frammenti",
-    song3_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    song3_title: "Riflessi",
-    city: "bologna",
-  },
-  {
-    id: "3",
-    name: "Nebula",
-    instagram: "nebula_official",
-    song1_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    song1_title: "Galassia",
-    song2_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    song2_title: "Polvere di Stelle",
-    song3_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    song3_title: "Orbita",
-    city: "rende",
-  },
+const EDITIONS = [
+  { key: "2025-2026", label: "2025/2026" },
+  { key: "2026-2027", label: "2026/2027" },
 ];
 
 const Index = () => {
@@ -51,24 +19,40 @@ const Index = () => {
     () => localStorage.getItem("supernova_auth") === "true"
   );
   const [activeCity, setActiveCity] = useState<"bologna" | "rende">("bologna");
-  const [ratings, setRatings] = useState<Record<string, number>>({});
+  const [activeEdition, setActiveEdition] = useState("2025-2026");
+  const queryClient = useQueryClient();
+
+  const { data: artistsData, isLoading, error, refetch } = useArtists();
+  const { data: ratingsData } = useRatings(activeEdition);
 
   if (!authenticated) {
     return <PasswordGate onUnlock={() => setAuthenticated(true)} />;
   }
 
-  const filteredArtists = MOCK_ARTISTS.filter((a) => a.city === activeCity).map(
-    (a) => ({ ...a, rating: ratings[a.id] || 0 })
-  );
+  const ratingsMap: Record<string, number> = {};
+  ratingsData?.forEach((r: any) => {
+    ratingsMap[r.artist_entry_id] = r.rating;
+  });
 
-  const handleRate = (artistId: string, rating: number) => {
-    setRatings((prev) => ({ ...prev, [artistId]: rating }));
-    // TODO: Save to database
+  const filteredArtists: Artist[] = (artistsData?.entries || [])
+    .filter((a) => a.city === activeCity)
+    .map((a) => ({ ...a, rating: ratingsMap[a.id] || 0 }));
+
+  const handleRate = async (artistId: string, rating: number) => {
+    const { error } = await supabase
+      .from("ratings")
+      .upsert(
+        { artist_entry_id: artistId, rating, edition: activeEdition },
+        { onConflict: "artist_entry_id,edition" }
+      );
+    if (!error) {
+      queryClient.invalidateQueries({ queryKey: ["ratings", activeEdition] });
+    }
   };
 
   const cities = [
-    { key: "bologna" as const, label: "Finale Bologna" },
-    { key: "rende" as const, label: "Finale Rende" },
+    { key: "bologna" as const, label: "Bologna" },
+    { key: "rende" as const, label: "Rende (CS)" },
   ];
 
   return (
@@ -87,20 +71,49 @@ const Index = () => {
               </p>
             </div>
           </div>
-          <button
-            onClick={() => {
-              localStorage.removeItem("supernova_auth");
-              setAuthenticated(false);
-            }}
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Esci
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => refetch()}
+              className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+              title="Aggiorna"
+            >
+              <RefreshCw size={14} />
+            </button>
+            <button
+              onClick={() => {
+                localStorage.removeItem("supernova_auth");
+                setAuthenticated(false);
+              }}
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Esci
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* City Tabs */}
-      <div className="container max-w-4xl mx-auto px-4 mt-6">
+      <div className="container max-w-4xl mx-auto px-4 mt-6 space-y-4">
+        {/* Edition selector */}
+        <div className="flex items-center gap-2">
+          <Calendar size={14} className="text-muted-foreground" />
+          <div className="flex gap-1">
+            {EDITIONS.map((ed) => (
+              <button
+                key={ed.key}
+                onClick={() => setActiveEdition(ed.key)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-display font-medium transition-all ${
+                  activeEdition === ed.key
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {ed.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* City Tabs */}
         <div className="flex gap-2">
           {cities.map((city) => (
             <button
@@ -116,38 +129,59 @@ const Index = () => {
               {city.label}
             </button>
           ))}
+          {!isLoading && artistsData && (
+            <div className="flex items-center ml-auto text-xs text-muted-foreground font-display">
+              {filteredArtists.length} artisti
+            </div>
+          )}
         </div>
-      </div>
 
-      {/* Artists Grid */}
-      <div className="container max-w-4xl mx-auto px-4 mt-6">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeCity}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
-            className="grid gap-4 sm:grid-cols-2"
-          >
-            {filteredArtists.length === 0 ? (
-              <div className="col-span-full text-center py-16">
-                <p className="text-muted-foreground font-display">
-                  Nessun artista iscritto per questa finale
-                </p>
-              </div>
-            ) : (
-              filteredArtists.map((artist, i) => (
-                <ArtistCard
-                  key={artist.id}
-                  artist={artist}
-                  onRate={handleRate}
-                  index={i}
-                />
-              ))
-            )}
-          </motion.div>
-        </AnimatePresence>
+        {/* Content */}
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 size={24} className="animate-spin text-primary" />
+            <span className="ml-3 text-muted-foreground font-display">Caricamento artisti...</span>
+          </div>
+        ) : error ? (
+          <div className="text-center py-16">
+            <p className="text-destructive font-display mb-2">Errore nel caricamento</p>
+            <p className="text-muted-foreground text-sm">{(error as Error).message}</p>
+            <button
+              onClick={() => refetch()}
+              className="mt-4 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-display text-sm"
+            >
+              Riprova
+            </button>
+          </div>
+        ) : (
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`${activeCity}-${activeEdition}`}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="grid gap-4 sm:grid-cols-2"
+            >
+              {filteredArtists.length === 0 ? (
+                <div className="col-span-full text-center py-16">
+                  <p className="text-muted-foreground font-display">
+                    Nessun artista iscritto per questa finale
+                  </p>
+                </div>
+              ) : (
+                filteredArtists.map((artist, i) => (
+                  <ArtistCard
+                    key={artist.id}
+                    artist={artist}
+                    onRate={handleRate}
+                    index={i}
+                  />
+                ))
+              )}
+            </motion.div>
+          </AnimatePresence>
+        )}
       </div>
 
       {/* Footer glow */}
