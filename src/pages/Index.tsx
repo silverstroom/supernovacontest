@@ -10,6 +10,7 @@ import PasswordGate from "@/components/PasswordGate";
 import BottomNav, { type TabKey } from "@/components/BottomNav";
 import StatsView from "@/components/StatsView";
 import logoSupernova from "@/assets/logo-supernova.png";
+import logoColorfest from "@/assets/logo-colorfest.png";
 
 const EDITION = "2025-2026";
 
