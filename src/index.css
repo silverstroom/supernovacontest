@@ -6,55 +6,55 @@
 
 @layer base {
   :root {
-    --background: 240 6% 7%;
-    --foreground: 0 0% 95%;
+    --background: 40 20% 98%;
+    --foreground: 240 10% 10%;
 
-    --card: 240 6% 12%;
-    --card-foreground: 0 0% 95%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 10%;
 
-    --popover: 240 6% 12%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 10%;
 
-    --primary: 330 85% 60%;
+    --primary: 330 85% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 6% 18%;
-    --secondary-foreground: 0 0% 85%;
+    --secondary: 40 15% 94%;
+    --secondary-foreground: 240 10% 20%;
 
-    --muted: 240 5% 16%;
-    --muted-foreground: 240 5% 55%;
+    --muted: 40 10% 92%;
+    --muted-foreground: 240 5% 45%;
 
-    --accent: 30 90% 60%;
+    --accent: 30 90% 55%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 240 6% 20%;
-    --input: 240 6% 20%;
-    --ring: 330 85% 60%;
+    --border: 40 10% 88%;
+    --input: 40 10% 88%;
+    --ring: 330 85% 55%;
 
     --radius: 1rem;
 
-    --glass-bg: 240 6% 14%;
-    --glass-border: 240 6% 24%;
+    --glass-bg: 0 0% 100%;
+    --glass-border: 40 10% 85%;
     --glass-highlight: 0 0% 100%;
 
     --gradient-start: 30 90% 60%;
     --gradient-mid: 340 85% 58%;
     --gradient-end: 290 85% 55%;
 
-    --star-filled: 45 100% 55%;
-    --star-empty: 240 5% 25%;
+    --star-filled: 45 100% 50%;
+    --star-empty: 40 8% 80%;
 
-    --sidebar-background: 240 6% 10%;
-    --sidebar-foreground: 0 0% 85%;
-    --sidebar-primary: 330 85% 60%;
+    --sidebar-background: 40 15% 96%;
+    --sidebar-foreground: 240 10% 20%;
+    --sidebar-primary: 330 85% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 6% 18%;
-    --sidebar-accent-foreground: 0 0% 85%;
-    --sidebar-border: 240 6% 20%;
-    --sidebar-ring: 330 85% 60%;
+    --sidebar-accent: 40 15% 92%;
+    --sidebar-accent-foreground: 240 10% 20%;
+    --sidebar-border: 40 10% 88%;
+    --sidebar-ring: 330 85% 55%;
   }
 }
 
@@ -70,11 +70,11 @@
 
 @layer utilities {
   .glass {
-    @apply bg-glass/60 backdrop-blur-2xl border border-glass-border/30 shadow-lg;
+    @apply bg-card/80 backdrop-blur-xl border border-glass-border/40 shadow-sm;
   }
 
   .glass-hover {
-    @apply hover:bg-glass/80 hover:border-glass-border/50 transition-all duration-300;
+    @apply hover:bg-card hover:shadow-md hover:border-glass-border/60 transition-all duration-300;
   }
 
   .gradient-text {
