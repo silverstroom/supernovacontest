@@ -42,10 +42,10 @@ const Index = () => {
     return map;
   }, [ratingsData]);
 
-  const allArtists: Artist[] = useMemo(() => 
-    (artistsData?.entries || []).map((a) => ({ ...a, rating: ratingsMap[a.id] || 0 })),
-    [artistsData, ratingsMap]
-  );
+  const allArtists: Artist[] = useMemo(() => {
+    if (!activeEdition.active) return [];
+    return (artistsData?.entries || []).map((a) => ({ ...a, rating: ratingsMap[a.id] || 0 }));
+  }, [artistsData, ratingsMap, activeEdition]);
 
   const toggleFavorite = useCallback((id: string) => {
     setFavorites(prev => {
