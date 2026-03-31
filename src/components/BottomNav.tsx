@@ -17,30 +17,46 @@ const tabs = [
 
 const BottomNav = ({ active, onTabChange }: BottomNavProps) => {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 glass border-t border-border/30 pb-safe">
-      <div className="flex items-center justify-around h-16 max-w-lg mx-auto">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 glass border-t border-border/30">
+      <div className="flex items-center justify-around h-[4.5rem] max-w-lg mx-auto pb-safe">
         {tabs.map((tab) => {
           const isActive = active === tab.key;
           return (
-            <button
+            <motion.button
               key={tab.key}
+              whileTap={{ scale: 0.85 }}
               onClick={() => onTabChange(tab.key)}
-              className="flex flex-col items-center justify-center gap-0.5 w-16 relative"
+              className="flex flex-col items-center justify-center gap-1 w-16 h-14 relative"
             >
-              <tab.icon
-                size={20}
-                className={`transition-colors ${
-                  isActive ? "text-primary" : "text-muted-foreground"
-                }`}
-              />
+              {isActive && (
+                <motion.div
+                  layoutId="navIndicator"
+                  className="absolute -top-1 w-8 h-1 rounded-full bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end"
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+              )}
+              <motion.div
+                animate={{ 
+                  y: isActive ? -2 : 0,
+                  scale: isActive ? 1.1 : 1,
+                }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              >
+                <tab.icon
+                  size={22}
+                  className={`transition-colors duration-200 ${
+                    isActive ? "text-primary" : "text-muted-foreground"
+                  }`}
+                />
+              </motion.div>
               <span
-                className={`text-[10px] font-display transition-colors ${
-                  isActive ? "text-primary font-medium" : "text-muted-foreground"
+                className={`text-[10px] font-display transition-all duration-200 ${
+                  isActive ? "text-primary font-semibold" : "text-muted-foreground"
                 }`}
               >
                 {tab.label}
               </span>
-            </button>
+            </motion.button>
           );
         })}
       </div>

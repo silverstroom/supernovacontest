@@ -11,11 +11,9 @@ interface SongPlayerProps {
 const getEmbedInfo = (url: string): { embedUrl: string; height: number } | null => {
   if (!url) return null;
 
-  // YouTube
   const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
   if (ytMatch) return { embedUrl: `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1`, height: 200 };
 
-  // SoundCloud
   if (url.includes("soundcloud.com")) {
     return {
       embedUrl: `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&color=%23e84393&auto_play=true&show_artwork=true&show_comments=false&show_playcount=false&show_user=true&visual=false`,
@@ -23,17 +21,11 @@ const getEmbedInfo = (url: string): { embedUrl: string; height: number } | null 
     };
   }
 
-  // Spotify (handle /intl-xx/ paths)
   const spMatch = url.match(/spotify\.com\/(?:intl-\w+\/)?track\/([\w]+)/);
   if (spMatch) return { embedUrl: `https://open.spotify.com/embed/track/${spMatch[1]}?theme=0`, height: 80 };
 
-  // Bandcamp
-  if (url.includes("bandcamp.com")) {
-    // Bandcamp requires specific embed IDs we don't have, so use iframe with full page
-    return null;
-  }
+  if (url.includes("bandcamp.com")) return null;
 
-  // Mixcloud
   if (url.includes("mixcloud.com")) {
     return {
       embedUrl: `https://player-widget.mixcloud.com/widget/iframe/?feed=${encodeURIComponent(url)}&hide_cover=1&mini=1`,
@@ -70,7 +62,12 @@ const SongPlayer = ({ title, url, index }: SongPlayerProps) => {
   if (!url) return null;
 
   return (
-    <div className="space-y-2">
+    <motion.div 
+      className="space-y-2"
+      initial={{ opacity: 0, x: -8 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.08, duration: 0.3 }}
+    >
       <div className="flex items-center gap-3">
         <span className="text-[10px] font-display text-muted-foreground font-bold w-5 shrink-0">
           {String(index).padStart(2, "0")}
@@ -83,38 +80,46 @@ const SongPlayer = ({ title, url, index }: SongPlayerProps) => {
             {platform}
           </span>
         </div>
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           {embedInfo ? (
             <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+              whileTap={{ scale: 0.85 }}
               onClick={() => setIsPlaying(!isPlaying)}
-              className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 ${
                 isPlaying 
-                  ? "bg-primary text-primary-foreground" 
-                  : "bg-primary/20 text-primary hover:bg-primary/30"
+                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30" 
+                  : "bg-primary/20 text-primary active:bg-primary/30"
               }`}
             >
-              {isPlaying ? <Pause size={13} /> : <Play size={13} className="ml-0.5" />}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={isPlaying ? "pause" : "play"}
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.5, opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  {isPlaying ? <Pause size={15} /> : <Play size={15} className="ml-0.5" />}
+                </motion.div>
+              </AnimatePresence>
             </motion.button>
           ) : (
             <a
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary hover:bg-primary/30 transition-colors"
-              title="Ascolta su piattaforma esterna"
+              className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary active:bg-primary/30 transition-colors"
             >
-              <Music size={13} />
+              <Music size={15} />
             </a>
           )}
           <a
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+            className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground active:text-foreground transition-colors"
           >
-            <ExternalLink size={12} />
+            <ExternalLink size={13} />
           </a>
         </div>
       </div>
@@ -124,8 +129,8 @@ const SongPlayer = ({ title, url, index }: SongPlayerProps) => {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: embedInfo.height + 8, opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="rounded-lg overflow-hidden ml-8"
+            transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="rounded-xl overflow-hidden ml-8"
           >
             <iframe
               src={embedInfo.embedUrl}
@@ -134,12 +139,12 @@ const SongPlayer = ({ title, url, index }: SongPlayerProps) => {
               frameBorder="0"
               allow="autoplay; encrypted-media"
               allowFullScreen
-              className="rounded-lg"
+              className="rounded-xl"
             />
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 };
 
