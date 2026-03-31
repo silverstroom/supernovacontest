@@ -20,25 +20,22 @@ serve(async (req) => {
       throw new Error("Gravity Forms API credentials not configured");
     }
 
-    const url = new URL(req.url);
-    const formId = url.searchParams.get("form_id") || "1";
-    const pageSize = url.searchParams.get("page_size") || "200";
-    const page = url.searchParams.get("page") || "1";
-
     const credentials = btoa(`${GF_CONSUMER_KEY}:${GF_CONSUMER_SECRET}`);
-
-    // Fetch all entries with pagination
     const allEntries: any[] = [];
-    let currentPage = parseInt(page);
+    let currentPage = 1;
     let hasMore = true;
+    const pageSize = 100;
+
+    // Use server-side search to only get Paid entries
+    const searchParam = encodeURIComponent(JSON.stringify({
+      field_filters: [{ key: "payment_status", value: "Paid" }]
+    }));
 
     while (hasMore) {
-      const gfUrl = `${GF_BASE_URL}/forms/${formId}/entries?paging[page_size]=${pageSize}&paging[current_page]=${currentPage}`;
+      const gfUrl = `${GF_BASE_URL}/forms/1/entries?paging[page_size]=${pageSize}&paging[current_page]=${currentPage}&search=${searchParam}`;
       
       const response = await fetch(gfUrl, {
-        headers: {
-          "Authorization": `Basic ${credentials}`,
-        },
+        headers: { "Authorization": `Basic ${credentials}` },
       });
 
       if (!response.ok) {
@@ -49,18 +46,18 @@ serve(async (req) => {
       const data = await response.json();
       const entries = data.entries || [];
       
-      // Filter for paid entries with artist name
+      // Extra filter: must have artist name filled
       const validEntries = entries.filter((e: any) => 
-        e.payment_status === "Paid" && e["10"] && e["10"].trim() !== ""
+        e["10"] && e["10"].trim() !== ""
       );
 
       const mapped = validEntries.map((e: any) => ({
         id: e.id,
-        name: e["10"],
+        name: e["10"].trim(),
         city: e["24"] === "Finale di Bologna" ? "bologna" : "rende",
-        song1_url: e["29"] || "",
-        song2_url: e["30"] || "",
-        song3_url: e["31"] || "",
+        song1_url: (e["29"] || "").trim(),
+        song2_url: (e["30"] || "").trim(),
+        song3_url: (e["31"] || "").trim(),
         referent_name: `${e["1.3"] || ""} ${e["1.6"] || ""}`.trim(),
         email: e["2"] || "",
         date_created: e.date_created,
@@ -68,7 +65,7 @@ serve(async (req) => {
 
       allEntries.push(...mapped);
 
-      if (entries.length < parseInt(pageSize)) {
+      if (entries.length < pageSize) {
         hasMore = false;
       } else {
         currentPage++;
