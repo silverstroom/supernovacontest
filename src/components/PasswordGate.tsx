@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Lock } from "lucide-react";
+import logoSupernova from "@/assets/logo-supernova.png";
+import logoColorfest from "@/assets/logo-colorfest.png";
 
 interface PasswordGateProps {
   onUnlock: () => void;
@@ -24,18 +26,20 @@ const PasswordGate = ({ onUnlock }: PasswordGateProps) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="glass gradient-border rounded-3xl p-8 w-full max-w-sm text-center space-y-6"
       >
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gradient-start via-gradient-mid to-gradient-end flex items-center justify-center mx-auto">
-          <Lock size={28} className="text-primary-foreground" />
+        <div className="flex items-center justify-center gap-3">
+          <img src={logoSupernova} alt="Supernova" className="h-14 w-14" />
+          <span className="text-muted-foreground text-xl font-light">×</span>
+          <img src={logoColorfest} alt="Color Fest" className="h-10" />
         </div>
         <div>
           <h1 className="text-2xl font-display font-bold gradient-text">Supernova</h1>
-          <p className="text-muted-foreground text-sm mt-1">Inserisci la password per accedere</p>
+          <p className="text-muted-foreground text-sm mt-1">il Contest del Color Fest</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
