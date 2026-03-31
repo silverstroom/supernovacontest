@@ -13,8 +13,8 @@ import logoSupernova from "@/assets/logo-supernova.png";
 import logoColorfest from "@/assets/logo-colorfest.png";
 
 const EDITIONS = [
-  { key: "color-fest-14", label: "Color Fest XIV", subtitle: "Agosto 2026", edition: "2025-2026" },
-  { key: "color-fest-15", label: "Color Fest XV", subtitle: "Prossimamente", edition: "2026-2027" },
+  { key: "color-fest-14", label: "Color Fest XIV", subtitle: "Agosto 2026", edition: "2025-2026", active: true },
+  { key: "color-fest-15", label: "Color Fest XV", subtitle: "Prossimamente", edition: "2026-2027", active: false },
 ];
 
 const Index = () => {
@@ -42,10 +42,10 @@ const Index = () => {
     return map;
   }, [ratingsData]);
 
-  const allArtists: Artist[] = useMemo(() => 
-    (artistsData?.entries || []).map((a) => ({ ...a, rating: ratingsMap[a.id] || 0 })),
-    [artistsData, ratingsMap]
-  );
+  const allArtists: Artist[] = useMemo(() => {
+    if (!activeEdition.active) return [];
+    return (artistsData?.entries || []).map((a) => ({ ...a, rating: ratingsMap[a.id] || 0 }));
+  }, [artistsData, ratingsMap, activeEdition]);
 
   const toggleFavorite = useCallback((id: string) => {
     setFavorites(prev => {
