@@ -274,6 +274,28 @@ const Index = () => {
           </div>
         )}
 
+        {/* Rating filter toggle (on home tab) */}
+        {activeTab === "home" && (
+          <div className="flex gap-2">
+            {([
+              { key: "unrated" as const, label: "Da votare", count: unratedArtists.length },
+              { key: "rated" as const, label: "Già votati", count: ratedArtists.length },
+            ]).map((filter) => (
+              <button
+                key={filter.key}
+                onClick={() => setRatingFilter(filter.key)}
+                className={`flex-1 px-3 py-2 rounded-xl font-display text-xs font-medium transition-all text-center ${
+                  ratingFilter === filter.key
+                    ? "bg-foreground text-background shadow-sm"
+                    : "glass text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {filter.label} ({filter.count})
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Count */}
         {activeTab !== "stats" && !isLoading && (
           <p className="text-xs text-muted-foreground font-display">
