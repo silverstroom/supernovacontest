@@ -168,7 +168,7 @@ const Index = () => {
                 Supernova
               </h1>
               <p className="text-[9px] text-muted-foreground uppercase tracking-widest">
-                Color Fest XIV · Agosto 2026
+                {activeEdition.label} · {activeEdition.subtitle}
               </p>
             </div>
           </div>
