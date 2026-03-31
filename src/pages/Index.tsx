@@ -276,7 +276,7 @@ const Index = () => {
         {/* Count */}
         {activeTab !== "stats" && !isLoading && (
           <p className="text-xs text-muted-foreground font-display">
-            {filteredArtists.length} {filteredArtists.length === 1 ? "artista" : "artisti"}
+            {totalFiltered} {totalFiltered === 1 ? "artista" : "artisti"}
             {activeTab === "home" && ` · Finale ${activeCity === "bologna" ? "Bologna" : "Rende"}`}
           </p>
         )}
