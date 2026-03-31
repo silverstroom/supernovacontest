@@ -1,6 +1,6 @@
 import { Star, X } from "lucide-react";
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useRef, useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface StarRatingProps {
   rating: number;
@@ -9,83 +9,187 @@ interface StarRatingProps {
   disabled?: boolean;
 }
 
+const STAR_COUNT = 10;
+const STAR_SIZE = 28;
+const STAR_GAP = 2;
+
 const StarRating = ({ rating, onRate, onClear, disabled }: StarRatingProps) => {
-  const [hover, setHover] = useState(0);
+  const [preview, setPreview] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleClick = (starIndex: number, isLeftHalf: boolean) => {
+  const getValueFromPosition = useCallback((clientX: number): number => {
+    if (!containerRef.current) return 0;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const starWidth = STAR_SIZE + STAR_GAP;
+    const totalWidth = starWidth * STAR_COUNT;
+    const clampedX = Math.max(0, Math.min(x, totalWidth));
+    
+    // Calculate which star and half
+    const starIndex = clampedX / starWidth;
+    const starNumber = Math.floor(starIndex) + 1;
+    const fraction = starIndex - Math.floor(starIndex);
+    
+    if (starNumber > STAR_COUNT) return STAR_COUNT;
+    if (starNumber < 1) return 0.5;
+    
+    return fraction < 0.5 ? starNumber - 0.5 : starNumber;
+  }, []);
+
+  // Touch handlers
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (disabled) return;
-    const value = isLeftHalf ? starIndex - 0.5 : starIndex;
-    onRate(value);
-  };
+    e.preventDefault();
+    setIsDragging(true);
+    const val = getValueFromPosition(e.touches[0].clientX);
+    setPreview(val);
+  }, [disabled, getValueFromPosition]);
 
-  const handleHover = (starIndex: number, isLeftHalf: boolean) => {
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (disabled || !isDragging) return;
+    e.preventDefault();
+    const val = getValueFromPosition(e.touches[0].clientX);
+    setPreview(val);
+  }, [disabled, isDragging, getValueFromPosition]);
+
+  const handleTouchEnd = useCallback(() => {
+    if (disabled || !isDragging) return;
+    if (preview > 0) onRate(preview);
+    setIsDragging(false);
+    setPreview(0);
+  }, [disabled, isDragging, preview, onRate]);
+
+  // Mouse handlers
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (disabled) return;
-    setHover(isLeftHalf ? starIndex - 0.5 : starIndex);
-  };
+    setIsDragging(true);
+    const val = getValueFromPosition(e.clientX);
+    setPreview(val);
+  }, [disabled, getValueFromPosition]);
 
-  const displayValue = hover || rating;
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (disabled) return;
+    const val = getValueFromPosition(e.clientX);
+    if (isDragging) {
+      setPreview(val);
+    } else {
+      setPreview(val);
+    }
+  }, [disabled, isDragging, getValueFromPosition]);
+
+  const handleMouseUp = useCallback(() => {
+    if (disabled || !isDragging) return;
+    if (preview > 0) onRate(preview);
+    setIsDragging(false);
+    setPreview(0);
+  }, [disabled, isDragging, preview, onRate]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (!isDragging) setPreview(0);
+  }, [isDragging]);
+
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    if (disabled) return;
+    const val = getValueFromPosition(e.clientX);
+    onRate(val);
+    setPreview(0);
+    setIsDragging(false);
+  }, [disabled, getValueFromPosition, onRate]);
+
+  const displayValue = isDragging ? preview : (preview || rating);
 
   return (
-    <div className="flex items-center gap-0.5">
-      {Array.from({ length: 10 }, (_, i) => i + 1).map((star) => {
-        const isFull = displayValue >= star;
-        const isHalf = !isFull && displayValue >= star - 0.5;
-
-        return (
-          <div key={star} className="relative w-[18px] h-[18px]">
-            {/* Left half hitbox */}
-            <div
-              className="absolute left-0 top-0 w-1/2 h-full z-10 cursor-pointer"
-              style={{ cursor: disabled ? "not-allowed" : "pointer" }}
-              onMouseEnter={() => handleHover(star, true)}
-              onMouseLeave={() => setHover(0)}
-              onClick={() => handleClick(star, true)}
-            />
-            {/* Right half hitbox */}
-            <div
-              className="absolute right-0 top-0 w-1/2 h-full z-10 cursor-pointer"
-              style={{ cursor: disabled ? "not-allowed" : "pointer" }}
-              onMouseEnter={() => handleHover(star, false)}
-              onMouseLeave={() => setHover(0)}
-              onClick={() => handleClick(star, false)}
-            />
-            {/* Star icon */}
-            <motion.div whileHover={{ scale: disabled ? 1 : 1.2 }}>
-              {isHalf ? (
-                <div className="relative w-[18px] h-[18px]">
-                  <Star size={18} className="absolute fill-transparent text-star-empty" />
-                  <div className="absolute overflow-hidden w-[9px] h-[18px]">
-                    <Star size={18} className="fill-star-filled text-star-filled" />
-                  </div>
-                </div>
-              ) : (
-                <Star
-                  size={18}
-                  className={`transition-colors duration-200 ${
-                    isFull
-                      ? "fill-star-filled text-star-filled"
-                      : "fill-transparent text-star-empty"
-                  }`}
-                />
-              )}
-            </motion.div>
-          </div>
-        );
-      })}
-      <span className="ml-2 text-sm font-display text-muted-foreground">
-        {rating > 0 ? `${rating}/10` : "—"}
-      </span>
-      {rating > 0 && onClear && (
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={onClear}
-          className="ml-1 w-6 h-6 rounded-full bg-destructive/20 flex items-center justify-center text-destructive hover:bg-destructive/30 transition-colors"
-          title="Annulla voto"
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-2">
+        <div
+          ref={containerRef}
+          className="flex items-center touch-none select-none"
+          style={{ gap: `${STAR_GAP}px` }}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
+          onClick={handleClick}
         >
-          <X size={12} />
-        </motion.button>
-      )}
+          {Array.from({ length: STAR_COUNT }, (_, i) => {
+            const star = i + 1;
+            const isFull = displayValue >= star;
+            const isHalf = !isFull && displayValue >= star - 0.5;
+
+            return (
+              <motion.div
+                key={star}
+                style={{ width: STAR_SIZE, height: STAR_SIZE }}
+                className="relative cursor-pointer"
+                animate={{
+                  scale: isDragging && displayValue >= star - 0.5 ? 1.15 : 1,
+                }}
+                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              >
+                {isHalf ? (
+                  <div className="relative" style={{ width: STAR_SIZE, height: STAR_SIZE }}>
+                    <Star size={STAR_SIZE} className="absolute text-star-empty fill-transparent" />
+                    <div className="absolute overflow-hidden" style={{ width: STAR_SIZE / 2, height: STAR_SIZE }}>
+                      <Star size={STAR_SIZE} className="fill-star-filled text-star-filled drop-shadow-[0_0_6px_hsl(var(--star-filled)/0.5)]" />
+                    </div>
+                  </div>
+                ) : (
+                  <Star
+                    size={STAR_SIZE}
+                    className={`transition-colors duration-150 ${
+                      isFull
+                        ? "fill-star-filled text-star-filled drop-shadow-[0_0_6px_hsl(var(--star-filled)/0.5)]"
+                        : "fill-transparent text-star-empty"
+                    }`}
+                  />
+                )}
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+      
+      {/* Rating display + clear */}
+      <div className="flex items-center gap-2 ml-1">
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={isDragging ? `preview-${preview}` : `rating-${rating}`}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.15 }}
+            className={`text-sm font-display font-semibold ${
+              isDragging ? "text-star-filled" : "text-muted-foreground"
+            }`}
+          >
+            {isDragging && preview > 0
+              ? `${preview}/10`
+              : rating > 0
+                ? `${rating}/10`
+                : "Trascina per votare ★"}
+          </motion.span>
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {rating > 0 && onClear && !isDragging && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.5 }}
+              whileTap={{ scale: 0.85 }}
+              onClick={(e) => { e.stopPropagation(); onClear(); }}
+              className="w-7 h-7 rounded-full bg-destructive/15 flex items-center justify-center text-destructive active:bg-destructive/30 transition-colors"
+              title="Annulla voto"
+            >
+              <X size={14} />
+            </motion.button>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };
