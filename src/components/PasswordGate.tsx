@@ -16,7 +16,7 @@ const PasswordGate = ({ onUnlock }: PasswordGateProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === PASSWORD) {
+    if (password.trim().toLowerCase() === PASSWORD) {
       localStorage.setItem("supernova_auth", "true");
       onUnlock();
     } else {
@@ -43,11 +43,16 @@ const PasswordGate = ({ onUnlock }: PasswordGateProps) => {
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
-            type="password"
+            type="text"
+            inputMode="text"
+            autoComplete="off"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
-            className={`w-full px-4 py-3 rounded-xl bg-secondary border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
+            className={`w-full px-4 py-3 rounded-xl bg-secondary border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-base ${
               error ? "border-destructive animate-shake" : "border-border"
             }`}
           />
