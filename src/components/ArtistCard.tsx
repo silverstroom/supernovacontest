@@ -22,14 +22,15 @@ const ArtistCard = ({ artist, onRate, onClearRating, onToggleFavorite, isFavorit
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.97 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ 
-        delay: index * 0.04, 
-        duration: 0.4, 
-        ease: [0.25, 0.46, 0.45, 0.94] 
+        delay: index * 0.03, 
+        duration: 0.25, 
+        ease: "easeOut"
       }}
-      className="glass glass-hover rounded-2xl p-5 gradient-border active:scale-[0.98] transition-transform"
+      style={{ willChange: "transform, opacity", transform: "translateZ(0)" }}
+      className="glass glass-hover rounded-2xl p-5 gradient-border"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
