@@ -13,7 +13,7 @@ const getEmbedInfo = (url: string): { embedUrl: string; height: number } | null 
 
   // YouTube
   const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
-  if (ytMatch) return { embedUrl: `https://www.youtube.com/embed/${ytMatch[1]}`, height: 200 };
+  if (ytMatch) return { embedUrl: `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1`, height: 200 };
 
   // SoundCloud
   if (url.includes("soundcloud.com")) {
