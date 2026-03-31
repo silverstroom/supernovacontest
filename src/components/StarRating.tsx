@@ -1,10 +1,11 @@
-import { Star, StarHalf } from "lucide-react";
+import { Star, X } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 
 interface StarRatingProps {
   rating: number;
   onRate: (rating: number) => void;
+  onClear?: () => void;
   disabled?: boolean;
 }
 
