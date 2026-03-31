@@ -8,7 +8,7 @@ interface StarRatingProps {
   disabled?: boolean;
 }
 
-const StarRating = ({ rating, onRate, disabled }: StarRatingProps) => {
+const StarRating = ({ rating, onRate, onClear, disabled }: StarRatingProps) => {
   const [hover, setHover] = useState(0);
 
   const handleClick = (starIndex: number, isLeftHalf: boolean) => {
