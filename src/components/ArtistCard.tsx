@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Heart } from "lucide-react";
+import { Heart, Mail, User, Users } from "lucide-react";
 import type { Artist } from "@/types/artist";
 import StarRating from "./StarRating";
 import SongPlayer from "./SongPlayer";
