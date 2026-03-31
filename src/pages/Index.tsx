@@ -156,10 +156,11 @@ const Index = () => {
       {/* Header */}
       <header className="sticky top-0 z-50 glass border-b border-border/30">
         <div className="container max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src={logoSupernova} alt="Supernova" className="h-9 w-9" />
-            <div>
-              <h1 className="text-base font-display font-bold gradient-text leading-tight">
+          <div className="flex items-center gap-2.5">
+            <img src={logoSupernova} alt="Supernova" className="h-8 w-8" />
+            <img src={logoColorfest} alt="Color Fest" className="h-6" />
+            <div className="border-l border-border pl-2.5">
+              <h1 className="text-sm font-display font-bold gradient-text leading-tight">
                 Supernova
               </h1>
               <p className="text-[9px] text-muted-foreground uppercase tracking-widest">
