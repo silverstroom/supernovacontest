@@ -75,7 +75,7 @@ const Index = () => {
     { key: "rende" as const, label: "Rende (CS)" },
   ];
 
-  const getFilteredArtists = (): Artist[] => {
+  const getFilteredArtists = (): { unrated: Artist[]; rated: Artist[] } => {
     let list = allArtists;
 
     if (activeTab === "favorites") {
@@ -89,10 +89,14 @@ const Index = () => {
       list = list.filter((a) => a.name.toLowerCase().includes(q));
     }
 
-    return list;
+    const unrated = list.filter((a) => !a.rating || a.rating === 0);
+    const rated = list.filter((a) => a.rating && a.rating > 0);
+
+    return { unrated, rated };
   };
 
-  const filteredArtists = getFilteredArtists();
+  const { unrated: unratedArtists, rated: ratedArtists } = getFilteredArtists();
+  const totalFiltered = unratedArtists.length + ratedArtists.length;
 
   const renderContent = () => {
     if (isLoading) {

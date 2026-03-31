@@ -18,7 +18,7 @@ const getEmbedInfo = (url: string): { embedUrl: string; height: number } | null 
   // SoundCloud
   if (url.includes("soundcloud.com")) {
     return {
-      embedUrl: `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&color=%23e84393&auto_play=false&show_artwork=true&show_comments=false&show_playcount=false&show_user=true&visual=false`,
+      embedUrl: `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&color=%23e84393&auto_play=true&show_artwork=true&show_comments=false&show_playcount=false&show_user=true&visual=false`,
       height: 166,
     };
   }
