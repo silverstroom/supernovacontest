@@ -1,6 +1,6 @@
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Trophy, MapPin, Star, TrendingUp } from "lucide-react";
+import { Trophy, MapPin, Star, TrendingUp, Download } from "lucide-react";
 import type { Artist } from "@/types/artist";
 
 interface StatsViewProps {
@@ -31,6 +31,43 @@ const StatsView = ({ artists, ratingsMap }: StatsViewProps) => {
 
     return { bolognaArtists, rendeArtists, totalBologna, totalRende, totalRated, avgRating };
   }, [artists, ratingsMap]);
+
+  const downloadCSV = useCallback(() => {
+    const top5Bologna = stats.bolognaArtists.slice(0, 5);
+    const top5Rende = stats.rendeArtists.slice(0, 5);
+
+    const headers = ["Posizione", "Città", "Nome Artista/Band", "Referente", "Email", "Componenti", "Voto"];
+    const rows: string[][] = [];
+
+    const addRows = (list: typeof top5Bologna, city: string) => {
+      list.forEach((a, i) => {
+        rows.push([
+          String(i + 1),
+          city,
+          a.name || "",
+          a.referent_name || "",
+          a.email || "",
+          a.members || "",
+          String(a.rating),
+        ]);
+      });
+    };
+
+    addRows(top5Bologna, "Bologna");
+    addRows(top5Rende, "Rende (CS)");
+
+    const csvContent = [headers, ...rows]
+      .map((row) => row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(","))
+      .join("\n");
+
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "top5_color_fest.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  }, [stats]);
 
   const getMedalColor = (pos: number) => {
     if (pos === 0) return "from-yellow-400 to-amber-500";
@@ -68,6 +105,16 @@ const StatsView = ({ artists, ratingsMap }: StatsViewProps) => {
         <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Media voto generale</p>
         <p className="text-3xl font-display font-bold gradient-text">{stats.avgRating}<span className="text-base text-muted-foreground">/10</span></p>
       </div>
+
+      {/* Download CSV */}
+      <button
+        onClick={downloadCSV}
+        disabled={stats.bolognaArtists.length === 0 && stats.rendeArtists.length === 0}
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary text-primary-foreground font-display text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        <Download size={16} />
+        Scarica CSV Top 5 Bologna + Rende
+      </button>
 
       {/* Top rated per city */}
       {[

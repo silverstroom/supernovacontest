@@ -158,7 +158,7 @@ const Index = () => {
   return (
     <div className="min-h-screen pb-24">
       {/* Header */}
-      <header className="sticky top-0 z-50 glass border-b border-border/30">
+      <header className="sticky top-0 z-50 glass border-b-0">
         <div className="container max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <img src={logoSupernova} alt="Supernova" className="h-8 w-8" />
