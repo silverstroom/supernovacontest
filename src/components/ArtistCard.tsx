@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Heart } from "lucide-react";
+import { Heart, Mail, User, Users } from "lucide-react";
 import type { Artist } from "@/types/artist";
 import StarRating from "./StarRating";
 import SongPlayer from "./SongPlayer";
@@ -27,16 +27,11 @@ const ArtistCard = ({ artist, onRate, onToggleFavorite, isFavorite, index }: Art
       className="glass glass-hover rounded-2xl p-4 gradient-border"
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex-1 min-w-0">
           <h3 className="text-base font-display font-semibold text-foreground truncate">
             {artist.name}
           </h3>
-          {artist.referent_name && (
-            <p className="text-xs text-muted-foreground truncate">
-              Ref: {artist.referent_name}
-            </p>
-          )}
         </div>
         {onToggleFavorite && (
           <motion.button
@@ -53,6 +48,25 @@ const ArtistCard = ({ artist, onRate, onToggleFavorite, isFavorite, index }: Art
               }
             />
           </motion.button>
+        )}
+      </div>
+
+      {/* Info */}
+      <div className="flex flex-wrap gap-x-4 gap-y-1 mb-3 text-[11px] text-muted-foreground">
+        {artist.referent_name && (
+          <span className="flex items-center gap-1">
+            <User size={10} /> {artist.referent_name}
+          </span>
+        )}
+        {artist.email && (
+          <a href={`mailto:${artist.email}`} className="flex items-center gap-1 hover:text-foreground transition-colors">
+            <Mail size={10} /> {artist.email}
+          </a>
+        )}
+        {artist.members && (
+          <span className="flex items-center gap-1">
+            <Users size={10} /> {artist.members} componenti
+          </span>
         )}
       </div>
 

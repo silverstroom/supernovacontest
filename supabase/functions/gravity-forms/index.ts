@@ -60,6 +60,7 @@ serve(async (req) => {
         song3_url: (e["31"] || "").trim(),
         referent_name: `${e["1.3"] || ""} ${e["1.6"] || ""}`.trim(),
         email: e["2"] || "",
+        members: e["12"] || "",
         date_created: e.date_created,
       }));
 

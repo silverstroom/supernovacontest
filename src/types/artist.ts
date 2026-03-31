@@ -11,6 +11,8 @@ export interface Artist {
   city: 'bologna' | 'rende';
   rating?: number;
   referent_name?: string;
+  email?: string;
+  members?: string;
   date_created?: string;
 }
 
