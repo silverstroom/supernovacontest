@@ -27,13 +27,6 @@ const BottomNav = ({ active, onTabChange }: BottomNavProps) => {
               onClick={() => onTabChange(tab.key)}
               className="flex flex-col items-center justify-center gap-0.5 w-16 relative"
             >
-              {isActive && (
-                <motion.div
-                  layoutId="bottomNavIndicator"
-                  className="absolute -top-px left-3 right-3 h-0.5 rounded-full bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end"
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                />
-              )}
               <tab.icon
                 size={20}
                 className={`transition-colors ${
@@ -47,6 +40,13 @@ const BottomNav = ({ active, onTabChange }: BottomNavProps) => {
               >
                 {tab.label}
               </span>
+              {isActive && (
+                <motion.div
+                  layoutId="bottomNavIndicator"
+                  className="absolute -bottom-px left-3 right-3 h-0.5 rounded-full bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end"
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+              )}
             </button>
           );
         })}
