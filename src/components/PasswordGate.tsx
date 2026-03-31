@@ -32,10 +32,10 @@ const PasswordGate = ({ onUnlock }: PasswordGateProps) => {
         animate={{ opacity: 1, scale: 1 }}
         className="glass gradient-border rounded-3xl p-8 w-full max-w-sm text-center space-y-6"
       >
-        <div className="flex items-center justify-center gap-3">
-          <img src={logoSupernova} alt="Supernova" className="h-14 w-14" />
+        <div className="flex items-center justify-center gap-3 pt-1">
+          <img src={logoSupernova} alt="Supernova" className="h-12 w-12 object-contain" />
           <span className="text-muted-foreground text-xl font-light">×</span>
-          <img src={logoColorfest} alt="Color Fest" className="h-10" />
+          <img src={logoColorfest} alt="Color Fest" className="h-10 object-contain" />
         </div>
         <div>
           <h1 className="text-2xl font-display font-bold gradient-text">Supernova</h1>
