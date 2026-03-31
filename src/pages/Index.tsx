@@ -75,7 +75,7 @@ const Index = () => {
     { key: "rende" as const, label: "Rende (CS)" },
   ];
 
-  const getFilteredArtists = (): Artist[] => {
+  const getFilteredArtists = (): { unrated: Artist[]; rated: Artist[] } => {
     let list = allArtists;
 
     if (activeTab === "favorites") {
@@ -89,10 +89,14 @@ const Index = () => {
       list = list.filter((a) => a.name.toLowerCase().includes(q));
     }
 
-    return list;
+    const unrated = list.filter((a) => !a.rating || a.rating === 0);
+    const rated = list.filter((a) => a.rating && a.rating > 0);
+
+    return { unrated, rated };
   };
 
-  const filteredArtists = getFilteredArtists();
+  const { unrated: unratedArtists, rated: ratedArtists } = getFilteredArtists();
+  const totalFiltered = unratedArtists.length + ratedArtists.length;
 
   const renderContent = () => {
     if (isLoading) {
@@ -130,7 +134,7 @@ const Index = () => {
           transition={{ duration: 0.2 }}
           className="space-y-3"
         >
-          {filteredArtists.length === 0 ? (
+          {totalFiltered === 0 ? (
             <div className="text-center py-16">
               <p className="text-muted-foreground font-display">
                 {activeTab === "search" ? "Nessun risultato" 
@@ -139,16 +143,37 @@ const Index = () => {
               </p>
             </div>
           ) : (
-            filteredArtists.map((artist, i) => (
-              <ArtistCard
-                key={artist.id}
-                artist={artist}
-                onRate={handleRate}
-                onToggleFavorite={toggleFavorite}
-                isFavorite={favorites.has(artist.id)}
-                index={i}
-              />
-            ))
+            <>
+              {unratedArtists.map((artist, i) => (
+                <ArtistCard
+                  key={artist.id}
+                  artist={artist}
+                  onRate={handleRate}
+                  onToggleFavorite={toggleFavorite}
+                  isFavorite={favorites.has(artist.id)}
+                  index={i}
+                />
+              ))}
+              {ratedArtists.length > 0 && (
+                <>
+                  <div className="pt-4 pb-1">
+                    <p className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">
+                      Già votati
+                    </p>
+                  </div>
+                  {ratedArtists.map((artist, i) => (
+                    <ArtistCard
+                      key={artist.id}
+                      artist={artist}
+                      onRate={handleRate}
+                      onToggleFavorite={toggleFavorite}
+                      isFavorite={favorites.has(artist.id)}
+                      index={unratedArtists.length + i}
+                    />
+                  ))}
+                </>
+              )}
+            </>
           )}
         </motion.div>
       </AnimatePresence>
@@ -251,7 +276,7 @@ const Index = () => {
         {/* Count */}
         {activeTab !== "stats" && !isLoading && (
           <p className="text-xs text-muted-foreground font-display">
-            {filteredArtists.length} {filteredArtists.length === 1 ? "artista" : "artisti"}
+            {totalFiltered} {totalFiltered === 1 ? "artista" : "artisti"}
             {activeTab === "home" && ` · Finale ${activeCity === "bologna" ? "Bologna" : "Rende"}`}
           </p>
         )}
