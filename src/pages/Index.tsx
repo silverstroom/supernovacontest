@@ -68,12 +68,15 @@ const Index = () => {
   }, [queryClient, activeEdition.edition]);
 
   const handleClearRating = useCallback(async (artistId: string) => {
-    await supabase
+    const { error } = await supabase
       .from("ratings")
       .delete()
       .eq("artist_entry_id", artistId)
       .eq("edition", activeEdition.edition);
-    queryClient.invalidateQueries({ queryKey: ["ratings", activeEdition.edition] });
+    if (error) {
+      console.error("Delete rating error:", error);
+    }
+    await queryClient.invalidateQueries({ queryKey: ["ratings", activeEdition.edition] });
   }, [queryClient, activeEdition.edition]);
 
   if (!authenticated) {
