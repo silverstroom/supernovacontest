@@ -12,7 +12,10 @@ import StatsView from "@/components/StatsView";
 import logoSupernova from "@/assets/logo-supernova.png";
 import logoColorfest from "@/assets/logo-colorfest.png";
 
-const EDITION = "2025-2026";
+const EDITIONS = [
+  { key: "color-fest-14", label: "Color Fest XIV", subtitle: "Agosto 2026", edition: "2025-2026" },
+  { key: "color-fest-15", label: "Color Fest XV", subtitle: "Prossimamente", edition: "2026-2027" },
+];
 
 const Index = () => {
   const [authenticated, setAuthenticated] = useState(
