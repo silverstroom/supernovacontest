@@ -23,6 +23,7 @@ const Index = () => {
   );
   const [activeCity, setActiveCity] = useState<"bologna" | "rende">("bologna");
   const [activeTab, setActiveTab] = useState<TabKey>("home");
+  const [activeEdition, setActiveEdition] = useState(EDITIONS[0]);
   const [searchQuery, setSearchQuery] = useState("");
   const [favorites, setFavorites] = useState<Set<string>>(() => {
     try {
