@@ -75,6 +75,17 @@ const StarRating = ({ rating, onRate, onClear, disabled }: StarRatingProps) => {
       <span className="ml-2 text-sm font-display text-muted-foreground">
         {rating > 0 ? `${rating}/10` : "—"}
       </span>
+      {rating > 0 && onClear && (
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={onClear}
+          className="ml-1 w-6 h-6 rounded-full bg-destructive/20 flex items-center justify-center text-destructive hover:bg-destructive/30 transition-colors"
+          title="Annulla voto"
+        >
+          <X size={12} />
+        </motion.button>
+      )}
     </div>
   );
 };
