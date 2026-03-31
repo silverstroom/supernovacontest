@@ -135,47 +135,35 @@ const Index = () => {
           transition={{ duration: 0.2 }}
           className="space-y-3"
         >
-          {totalFiltered === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-muted-foreground font-display">
-                {activeTab === "search" ? "Nessun risultato" 
-                  : activeTab === "favorites" ? "Nessun preferito salvato"
-                  : "Nessun artista iscritto"}
-              </p>
-            </div>
-          ) : (
-            <>
-              {unratedArtists.map((artist, i) => (
-                <ArtistCard
-                  key={artist.id}
-                  artist={artist}
-                  onRate={handleRate}
-                  onToggleFavorite={toggleFavorite}
-                  isFavorite={favorites.has(artist.id)}
-                  index={i}
-                />
-              ))}
-              {ratedArtists.length > 0 && (
-                <>
-                  <div className="pt-4 pb-1">
-                    <p className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">
-                      Già votati
-                    </p>
-                  </div>
-                  {ratedArtists.map((artist, i) => (
-                    <ArtistCard
-                      key={artist.id}
-                      artist={artist}
-                      onRate={handleRate}
-                      onToggleFavorite={toggleFavorite}
-                      isFavorite={favorites.has(artist.id)}
-                      index={unratedArtists.length + i}
-                    />
-                  ))}
-                </>
-              )}
-            </>
-          )}
+          {(() => {
+            const displayArtists = activeTab === "home" 
+              ? (ratingFilter === "unrated" ? unratedArtists : ratedArtists)
+              : [...unratedArtists, ...ratedArtists];
+            
+            if (displayArtists.length === 0) {
+              return (
+                <div className="text-center py-16">
+                  <p className="text-muted-foreground font-display">
+                    {activeTab === "search" ? "Nessun risultato" 
+                      : activeTab === "favorites" ? "Nessun preferito salvato"
+                      : ratingFilter === "rated" ? "Nessun artista votato"
+                      : "Tutti gli artisti sono stati votati!"}
+                  </p>
+                </div>
+              );
+            }
+
+            return displayArtists.map((artist, i) => (
+              <ArtistCard
+                key={artist.id}
+                artist={artist}
+                onRate={handleRate}
+                onToggleFavorite={toggleFavorite}
+                isFavorite={favorites.has(artist.id)}
+                index={i}
+              />
+            ));
+          })()}
         </motion.div>
       </AnimatePresence>
     );
