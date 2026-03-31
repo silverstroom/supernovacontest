@@ -158,7 +158,7 @@ const Index = () => {
   return (
     <div className="min-h-screen pb-24">
       {/* Header */}
-      <header className="sticky top-0 z-50 glass border-b-0">
+      <header className="sticky top-0 z-50 glass">
         <div className="container max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <img src={logoSupernova} alt="Supernova" className="h-8 w-8" />
@@ -184,6 +184,7 @@ const Index = () => {
             </button>
           </div>
         </div>
+        <div className="border-b border-border/30" />
       </header>
 
       <div className="container max-w-lg mx-auto px-4 mt-4 space-y-4">
