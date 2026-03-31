@@ -167,6 +167,7 @@ const Index = () => {
                 key={artist.id}
                 artist={artist}
                 onRate={handleRate}
+                onClearRating={handleClearRating}
                 onToggleFavorite={toggleFavorite}
                 isFavorite={favorites.has(artist.id)}
                 index={i}

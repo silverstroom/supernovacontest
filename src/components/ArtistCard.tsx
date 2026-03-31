@@ -83,6 +83,7 @@ const ArtistCard = ({ artist, onRate, onClearRating, onToggleFavorite, isFavorit
         <StarRating
           rating={artist.rating || 0}
           onRate={(r) => onRate(artist.id, r)}
+          onClear={onClearRating ? () => onClearRating(artist.id) : undefined}
         />
       </div>
     </motion.div>
