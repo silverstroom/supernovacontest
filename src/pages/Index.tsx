@@ -207,6 +207,26 @@ const Index = () => {
           </motion.div>
         )}
 
+        {/* Edition selector (on home tab) */}
+        {activeTab === "home" && (
+          <div className="flex gap-2">
+            {EDITIONS.map((ed) => (
+              <button
+                key={ed.key}
+                onClick={() => setActiveEdition(ed)}
+                className={`flex-1 px-3 py-2 rounded-xl font-display text-xs font-medium transition-all text-center ${
+                  activeEdition.key === ed.key
+                    ? "bg-foreground text-background shadow-sm"
+                    : "glass text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <span className="block font-semibold">{ed.label}</span>
+                <span className="block text-[10px] opacity-70">{ed.subtitle}</span>
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* City Tabs (only on home tab) */}
         {activeTab === "home" && (
           <div className="flex gap-2">
