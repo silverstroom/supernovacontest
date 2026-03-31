@@ -16,7 +16,7 @@ const PasswordGate = ({ onUnlock }: PasswordGateProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === PASSWORD) {
+    if (password.trim().toLowerCase() === PASSWORD) {
       localStorage.setItem("supernova_auth", "true");
       onUnlock();
     } else {
