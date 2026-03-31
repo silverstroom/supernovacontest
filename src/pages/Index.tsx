@@ -138,13 +138,14 @@ const Index = () => {
     }
 
     return (
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" initial={false}>
         <motion.div
-          key={`${activeTab}-${activeCity}-${searchQuery}-${ratingFilter}`}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.2 }}
+          key={`${activeTab}-${activeCity}-${ratingFilter}`}
+          initial={{ opacity: 0, x: 12 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -12 }}
+          transition={{ duration: 0.18, ease: "easeOut" }}
+          style={{ willChange: "transform, opacity", transform: "translateZ(0)" }}
           className="space-y-3"
         >
           {(() => {
@@ -173,7 +174,7 @@ const Index = () => {
                 onClearRating={handleClearRating}
                 onToggleFavorite={toggleFavorite}
                 isFavorite={favorites.has(artist.id)}
-                index={i}
+                index={Math.min(i, 5)}
               />
             ));
           })()}
