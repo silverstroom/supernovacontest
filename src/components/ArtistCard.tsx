@@ -27,16 +27,11 @@ const ArtistCard = ({ artist, onRate, onToggleFavorite, isFavorite, index }: Art
       className="glass glass-hover rounded-2xl p-4 gradient-border"
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex-1 min-w-0">
           <h3 className="text-base font-display font-semibold text-foreground truncate">
             {artist.name}
           </h3>
-          {artist.referent_name && (
-            <p className="text-xs text-muted-foreground truncate">
-              Ref: {artist.referent_name}
-            </p>
-          )}
         </div>
         {onToggleFavorite && (
           <motion.button
