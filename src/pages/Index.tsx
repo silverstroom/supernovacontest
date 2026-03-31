@@ -68,12 +68,15 @@ const Index = () => {
   }, [queryClient, activeEdition.edition]);
 
   const handleClearRating = useCallback(async (artistId: string) => {
-    await supabase
+    const { error } = await supabase
       .from("ratings")
       .delete()
       .eq("artist_entry_id", artistId)
       .eq("edition", activeEdition.edition);
-    queryClient.invalidateQueries({ queryKey: ["ratings", activeEdition.edition] });
+    if (error) {
+      console.error("Delete rating error:", error);
+    }
+    await queryClient.invalidateQueries({ queryKey: ["ratings", activeEdition.edition] });
   }, [queryClient, activeEdition.edition]);
 
   if (!authenticated) {
@@ -197,7 +200,7 @@ const Index = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => refetch()} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+            <button onClick={() => { refetch(); queryClient.invalidateQueries({ queryKey: ["ratings"] }); }} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
               <RefreshCw size={14} />
             </button>
             <button
