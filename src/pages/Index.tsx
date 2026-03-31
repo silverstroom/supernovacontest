@@ -12,7 +12,10 @@ import StatsView from "@/components/StatsView";
 import logoSupernova from "@/assets/logo-supernova.png";
 import logoColorfest from "@/assets/logo-colorfest.png";
 
-const EDITION = "2025-2026";
+const EDITIONS = [
+  { key: "color-fest-14", label: "Color Fest XIV", subtitle: "Agosto 2026", edition: "2025-2026" },
+  { key: "color-fest-15", label: "Color Fest XV", subtitle: "Prossimamente", edition: "2026-2027" },
+];
 
 const Index = () => {
   const [authenticated, setAuthenticated] = useState(
@@ -20,6 +23,7 @@ const Index = () => {
   );
   const [activeCity, setActiveCity] = useState<"bologna" | "rende">("bologna");
   const [activeTab, setActiveTab] = useState<TabKey>("home");
+  const [activeEdition, setActiveEdition] = useState(EDITIONS[0]);
   const [searchQuery, setSearchQuery] = useState("");
   const [favorites, setFavorites] = useState<Set<string>>(() => {
     try {
@@ -30,7 +34,7 @@ const Index = () => {
 
   const queryClient = useQueryClient();
   const { data: artistsData, isLoading, error, refetch } = useArtists();
-  const { data: ratingsData } = useRatings(EDITION);
+  const { data: ratingsData } = useRatings(activeEdition.edition);
 
   const ratingsMap: Record<string, number> = useMemo(() => {
     const map: Record<string, number> = {};
@@ -56,10 +60,10 @@ const Index = () => {
     await supabase
       .from("ratings")
       .upsert(
-        { artist_entry_id: artistId, rating, edition: EDITION },
+        { artist_entry_id: artistId, rating, edition: activeEdition.edition },
         { onConflict: "artist_entry_id,edition" }
       );
-    queryClient.invalidateQueries({ queryKey: ["ratings", EDITION] });
+    queryClient.invalidateQueries({ queryKey: ["ratings", activeEdition.edition] });
   }, [queryClient]);
 
   if (!authenticated) {
@@ -164,7 +168,7 @@ const Index = () => {
                 Supernova
               </h1>
               <p className="text-[9px] text-muted-foreground uppercase tracking-widest">
-                Color Fest XIV · Agosto 2026
+                {activeEdition.label} · {activeEdition.subtitle}
               </p>
             </div>
           </div>
@@ -201,6 +205,26 @@ const Index = () => {
               </button>
             )}
           </motion.div>
+        )}
+
+        {/* Edition selector (on home tab) */}
+        {activeTab === "home" && (
+          <div className="flex gap-2">
+            {EDITIONS.map((ed) => (
+              <button
+                key={ed.key}
+                onClick={() => setActiveEdition(ed)}
+                className={`flex-1 px-3 py-2 rounded-xl font-display text-xs font-medium transition-all text-center ${
+                  activeEdition.key === ed.key
+                    ? "bg-foreground text-background shadow-sm"
+                    : "glass text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <span className="block font-semibold">{ed.label}</span>
+                <span className="block text-[10px] opacity-70">{ed.subtitle}</span>
+              </button>
+            ))}
+          </div>
         )}
 
         {/* City Tabs (only on home tab) */}
