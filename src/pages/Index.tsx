@@ -60,10 +60,10 @@ const Index = () => {
     await supabase
       .from("ratings")
       .upsert(
-        { artist_entry_id: artistId, rating, edition: EDITION },
+        { artist_entry_id: artistId, rating, edition: activeEdition.edition },
         { onConflict: "artist_entry_id,edition" }
       );
-    queryClient.invalidateQueries({ queryKey: ["ratings", EDITION] });
+    queryClient.invalidateQueries({ queryKey: ["ratings", activeEdition.edition] });
   }, [queryClient]);
 
   if (!authenticated) {
