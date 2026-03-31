@@ -25,6 +25,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<TabKey>("home");
   const [activeEdition, setActiveEdition] = useState(EDITIONS[0]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [ratingFilter, setRatingFilter] = useState<"unrated" | "rated">("unrated");
   const [favorites, setFavorites] = useState<Set<string>>(() => {
     try {
       const stored = localStorage.getItem("supernova_favorites");
