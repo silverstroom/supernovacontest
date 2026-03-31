@@ -1,0 +1,1 @@
+CREATE POLICY "Anyone can delete ratings" ON public.ratings FOR DELETE USING (true);

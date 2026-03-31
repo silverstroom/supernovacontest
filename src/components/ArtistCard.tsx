@@ -7,12 +7,13 @@ import SongPlayer from "./SongPlayer";
 interface ArtistCardProps {
   artist: Artist;
   onRate: (artistId: string, rating: number) => void;
+  onClearRating?: (artistId: string) => void;
   onToggleFavorite?: (artistId: string) => void;
   isFavorite?: boolean;
   index: number;
 }
 
-const ArtistCard = ({ artist, onRate, onToggleFavorite, isFavorite, index }: ArtistCardProps) => {
+const ArtistCard = ({ artist, onRate, onClearRating, onToggleFavorite, isFavorite, index }: ArtistCardProps) => {
   const songs = [
     { title: "Brano 1", url: artist.song1_url },
     { title: "Brano 2", url: artist.song2_url },
@@ -82,6 +83,7 @@ const ArtistCard = ({ artist, onRate, onToggleFavorite, isFavorite, index }: Art
         <StarRating
           rating={artist.rating || 0}
           onRate={(r) => onRate(artist.id, r)}
+          onClear={onClearRating ? () => onClearRating(artist.id) : undefined}
         />
       </div>
     </motion.div>
