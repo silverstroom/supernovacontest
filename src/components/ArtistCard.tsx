@@ -51,6 +51,25 @@ const ArtistCard = ({ artist, onRate, onToggleFavorite, isFavorite, index }: Art
         )}
       </div>
 
+      {/* Info */}
+      <div className="flex flex-wrap gap-x-4 gap-y-1 mb-3 text-[11px] text-muted-foreground">
+        {artist.referent_name && (
+          <span className="flex items-center gap-1">
+            <User size={10} /> {artist.referent_name}
+          </span>
+        )}
+        {artist.email && (
+          <a href={`mailto:${artist.email}`} className="flex items-center gap-1 hover:text-foreground transition-colors">
+            <Mail size={10} /> {artist.email}
+          </a>
+        )}
+        {artist.members && (
+          <span className="flex items-center gap-1">
+            <Users size={10} /> {artist.members} componenti
+          </span>
+        )}
+      </div>
+
       {/* Songs */}
       <div className="space-y-2.5 mb-3">
         {songs.map((song, i) => (
