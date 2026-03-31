@@ -10,6 +10,7 @@ interface SongPlayerProps {
 
 const getEmbedUrl = (url: string): string | null => {
   // YouTube
+  // YouTube
   const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
   if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1`;
 
@@ -18,9 +19,14 @@ const getEmbedUrl = (url: string): string | null => {
     return `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&auto_play=true&color=%23e84393`;
   }
 
-  // Spotify
-  const spMatch = url.match(/spotify\.com\/track\/([\w]+)/);
-  if (spMatch) return `https://open.spotify.com/embed/track/${spMatch[1]}?autoplay=1`;
+  // Spotify (handle /intl-xx/ paths too)
+  const spMatch = url.match(/spotify\.com\/(?:intl-\w+\/)?track\/([\w]+)/);
+  if (spMatch) return `https://open.spotify.com/embed/track/${spMatch[1]}`;
+
+  // Bandcamp
+  if (url.includes("bandcamp.com")) {
+    return null; // Bandcamp doesn't support simple embeds without track ID, use external link
+  }
 
   return null;
 };
