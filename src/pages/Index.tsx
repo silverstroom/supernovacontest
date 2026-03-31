@@ -65,7 +65,16 @@ const Index = () => {
         { onConflict: "artist_entry_id,edition" }
       );
     queryClient.invalidateQueries({ queryKey: ["ratings", activeEdition.edition] });
-  }, [queryClient]);
+  }, [queryClient, activeEdition.edition]);
+
+  const handleClearRating = useCallback(async (artistId: string) => {
+    await supabase
+      .from("ratings")
+      .delete()
+      .eq("artist_entry_id", artistId)
+      .eq("edition", activeEdition.edition);
+    queryClient.invalidateQueries({ queryKey: ["ratings", activeEdition.edition] });
+  }, [queryClient, activeEdition.edition]);
 
   if (!authenticated) {
     return <PasswordGate onUnlock={() => setAuthenticated(true)} />;
