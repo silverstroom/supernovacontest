@@ -201,7 +201,7 @@ const Index = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => { refetch(); queryClient.invalidateQueries({ queryKey: ["ratings"] }); }} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+            <button onClick={async () => { await queryClient.resetQueries({ queryKey: ["artists"] }); await queryClient.resetQueries({ queryKey: ["ratings"] }); }} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
               <RefreshCw size={14} />
             </button>
             <button
